@@ -30,29 +30,25 @@ let pointFor player current =
     | PlayerOne -> current.PlayerOnePoint
     | PlayerTwo -> current.PlayerTwoPoint
 
-// Transitions
-
 // State machine
 
 let score current winner = 
     let scoreWhenGame winner = Game winner
 
-    let scoreWhenAdvantage advantagedPlayer winner =
-        if advantagedPlayer = winner
-        then Game winner
+    let scoreWhenAdvantage advantagedPlayer =
+        if advantagedPlayer = winner then Game winner
         else Deuce
 
-    let scoreWhenDeuce winner = Advantage winner
+    let scoreWhenDeuce = Advantage winner
 
-    let scoreWhenForty current winner =
-        if current.Player = winner
-        then Game winner
+    let scoreWhenForty current =
+        if current.Player = winner then Game winner
         else
             match incrementPoint current.OtherPlayerPoint with
             | Some p -> Forty { current with OtherPlayerPoint = p }
             | None -> Deuce
 
-    let scoreWhenPoints current winner =
+    let scoreWhenPoints current =
         match pointFor winner current |> incrementPoint with
         | Some np -> pointTo winner np current |> Points
         | None -> Forty {
@@ -60,10 +56,10 @@ let score current winner =
             OtherPlayerPoint = pointFor (other winner) current }
 
     match current with
-    | Points p -> scoreWhenPoints p winner
-    | Forty f -> scoreWhenForty f winner
-    | Deuce -> scoreWhenDeuce winner
-    | Advantage a -> scoreWhenAdvantage a winner
+    | Points p -> scoreWhenPoints p
+    | Forty f -> scoreWhenForty f
+    | Deuce -> scoreWhenDeuce
+    | Advantage a -> scoreWhenAdvantage a
     | Game g -> scoreWhenGame g
 
 let newGame = Points { PlayerOnePoint = Love; PlayerTwoPoint = Love }
